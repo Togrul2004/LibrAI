@@ -1,0 +1,3180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrAI — Sheffield Video Intelligence Platform</title>
+    <meta name="description"
+        content="AI-powered video discovery platform for the University of Sheffield. Automatically transcribes, analyses and indexes video content.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- University of Sheffield brand fonts: Source Sans 3 + Source Serif 4 -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            /* University of Sheffield exact brand colors */
+            --brand: #470098;
+            /* Sheffield Brand Violet */
+            --electric: #7005FF;
+            /* Sheffield Electric Violet */
+            --brand-mid: #5A09C0;
+            /* Transition midpoint */
+            --dark: #1a0a3b;
+            /* Deep dark for deep contrast */
+            --powder: #C4B5FD;
+            --pale: #EDE9FE;
+            --white: #fff;
+            --bg: #F6F5F8;
+            --text: #1F1235;
+            --muted: #6B6080;
+            --border: #E2DFF0;
+            --success: #059669;
+            --error: #DC2626;
+            --r: 10px;
+            --r-lg: 16px;
+            --r-xl: 22px;
+            --sh: 0 2px 14px rgba(71, 0, 152, .10);
+            --sh-md: 0 6px 28px rgba(71, 0, 152, .16);
+            --sh-lg: 0 20px 60px rgba(71, 0, 152, .24);
+            --t: .22s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            /* Sheffield brand typography: Source Sans 3 as primary body font */
+            font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Source Serif 4 for display headings */
+        h1,
+        h2,
+        .display-serif {
+            font-family: 'Source Serif 4', Georgia, serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--pale);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--powder);
+            border-radius: 99px;
+        }
+
+        /* ── NAV ──────────────────────────────────── */
+        /*
+         * Single full-width brand violet bar.
+         * The white logo (transparent bg) sits directly on the brand violet —
+         * no white box, no filter, no panel trick needed.
+         */
+        .nav {
+            background: var(--brand);
+            height: 92px;
+            display: flex;
+            align-items: center;
+            padding: 0 48px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 4px 28px rgba(71, 0, 152, .46);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            text-decoration: none;
+        }
+
+        /*
+         * White version logo (UOSLogo_Primary_White_RGB.png) —
+         * transparent background, white artwork, displayed directly on brand violet.
+         * No filter required. Proportions preserved. No box or clipping.
+         */
+        .nav-sheffield-logo {
+            height: 60px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* Vertical rule between Sheffield logo and LibrAI brand */
+        .nav-divider {
+            width: 1px;
+            height: 38px;
+            background: rgba(255, 255, 255, .25);
+            flex-shrink: 0;
+        }
+
+        /* LibrAI brand — Source Serif 4 name, Source Sans 3 labels */
+        .nav-librai {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.25;
+        }
+
+        .nav-librai-eyebrow {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: .64rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .6);
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .nav-librai-name {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -.01em;
+            line-height: 1;
+        }
+
+        .nav-librai-sub {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: .67rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, .55);
+            margin-top: 4px;
+            letter-spacing: .03em;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-pill {
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .28);
+            color: rgba(255, 255, 255, .82);
+            font-size: .71rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 99px;
+            letter-spacing: .04em;
+        }
+
+        .nav-add-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, .14);
+            border: 1.5px solid rgba(255, 255, 255, .34);
+            color: var(--white);
+            border-radius: var(--r);
+            padding: 11px 22px;
+            font-size: .85rem;
+            font-weight: 700;
+            font-family: 'Source Sans 3', sans-serif;
+            cursor: pointer;
+            transition: background var(--t), border-color var(--t), transform var(--t);
+        }
+
+        .nav-add-btn:hover {
+            background: rgba(255, 255, 255, .26);
+            border-color: rgba(255, 255, 255, .55);
+            transform: scale(1.02);
+        }
+
+        /* ── HERO ─────────────────────────────────────────── */
+        /* Hero: Brand Violet → Electric Violet — top-to-bottom brand narrative */
+        .hero {
+            background: linear-gradient(155deg, #470098 0%, #5A09C0 42%, #7005FF 100%);
+            padding: 84px 48px 96px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* Radial light spot for depth */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: 10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(255, 255, 255, .07) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 48px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .25);
+            color: rgba(255, 255, 255, .92);
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 99px;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+        }
+
+        /* Delete Button */
+        .video-delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: rgba(220, 38, 38, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            opacity: 0;
+            transition: all var(--t);
+            z-index: 10;
+        }
+
+        .video-card:hover .video-delete-btn {
+            opacity: 1;
+        }
+
+        .video-delete-btn:hover {
+            background: #DC2626;
+            transform: scale(1.1);
+        }
+
+        /* Source Serif 4 for the hero display headline — premium editorial feel */
+        .hero-title {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: clamp(2.3rem, 4vw, 3.6rem);
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.08;
+            letter-spacing: -.02em;
+            margin-bottom: 18px;
+        }
+
+        .hero-title span {
+            color: var(--powder);
+            font-style: italic;
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, .78);
+            max-width: 560px;
+            line-height: 1.78;
+            margin-bottom: 34px;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 38px;
+        }
+
+        .hero-tag {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: rgba(255, 255, 255, .9);
+            font-size: .78rem;
+            font-weight: 500;
+            padding: 7px 16px;
+            border-radius: 99px;
+            transition: background var(--t);
+        }
+
+        .hero-tag:hover {
+            background: rgba(255, 255, 255, .16);
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--white);
+            color: var(--brand);
+            font-weight: 800;
+            font-size: .96rem;
+            padding: 14px 30px;
+            border-radius: var(--r);
+            text-decoration: none;
+            transition: transform var(--t), box-shadow var(--t);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .22);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 36px rgba(0, 0, 0, .32);
+        }
+
+        .hero-graphic {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 370px;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: var(--r-lg);
+            padding: 14px 14px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 80px;
+            transition: background var(--t), border-color var(--t);
+        }
+
+        .stat-badge:hover {
+            background: rgba(255, 255, 255, .16);
+            border-color: rgba(255, 255, 255, .35);
+        }
+
+        .stat-badge.impact-badge {
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid var(--powder);
+        }
+
+        .stat-badge-num {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--white);
+            letter-spacing: -.03em;
+            line-height: 1.1;
+        }
+
+        .stat-badge-lbl {
+            font-size: .58rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .65);
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            margin-top: 4px;
+        }
+
+        /* ── DIFFERENTIATORS ──────────────────────────────── */
+        /* Electric Violet (#7005FF) — lower section, as specified in brand usage rules */
+        .diff-section {
+            background: var(--electric);
+            padding: 0 48px;
+        }
+
+        .diff-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid rgba(255, 255, 255, .15);
+        }
+
+        .diff-item {
+            padding: 30px 22px;
+            border-right: 1px solid rgba(255, 255, 255, .12);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .diff-item:last-child {
+            border-right: none;
+        }
+
+        .diff-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, .14);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .diff-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 5px;
+        }
+
+        .diff-desc {
+            font-size: .72rem;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.55;
+        }
+
+        /* ── MAIN LAYOUT ──────────────────────────────────── */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 36px 48px 80px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ── SIDEBAR ──────────────────────────────────────── */
+        .sidebar {
+            position: sticky;
+            top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar-card {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            padding: 22px;
+            box-shadow: var(--sh);
+        }
+
+        /* Source Sans 3 uppercase label on sidebar — electric violet accents in lower section */
+        .sidebar-card-title {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--electric);
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .sidebar-clear {
+            margin-left: auto;
+            font-size: .65rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Source Sans 3', sans-serif;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: color var(--t), background var(--t);
+        }
+
+        .sidebar-clear:hover {
+            color: var(--brand);
+            background: var(--pale);
+        }
+
+        .filter-group {
+            margin-bottom: 14px;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-group-title {
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 9px;
+        }
+
+        .filter-opt {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background var(--t);
+            margin-bottom: 2px;
+        }
+
+        .filter-opt:hover {
+            background: var(--pale);
+        }
+
+        .filter-opt.active {
+            background: var(--pale);
+        }
+
+        .filter-opt input {
+            accent-color: var(--electric);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .filter-opt-label {
+            font-size: .82rem;
+            color: var(--text);
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .filter-opt-count {
+            font-size: .68rem;
+            color: var(--muted);
+            background: var(--bg);
+            padding: 1px 7px;
+            border-radius: 99px;
+        }
+
+        .filter-opt.active .filter-opt-label {
+            color: var(--electric);
+            font-weight: 600;
+        }
+
+        /* ── CONTENT AREA ─────────────────────────────────── */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 2px;
+        }
+
+        .section-header-title {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -.01em;
+        }
+
+        .section-header-badge {
+            font-size: .65rem;
+            font-weight: 700;
+            color: var(--electric);
+            background: var(--pale);
+            border: 1px solid var(--powder);
+            padding: 2px 8px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        /* ── SEARCH ───────────────────────────────────────── */
+        .search-bar {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            box-shadow: var(--sh);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+            width: 17px;
+            height: 17px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 14px 12px 44px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            font-size: .9rem;
+            font-family: 'Source Sans 3', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border-color var(--t), box-shadow var(--t);
+        }
+
+        .search-input::placeholder {
+            color: var(--muted);
+        }
+
+        .search-input:focus {
+            border-color: var(--electric);
+            box-shadow: 0 0 0 3px rgba(112, 5, 255, .12);
+            background: var(--white);
+        }
+
+        /* Voice Search UI */
+        .voice-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--pale);
+            border: 1px solid var(--border);
+            color: var(--brand);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--t);
+            z-index: 10;
+        }
+
+        .voice-search-btn:hover {
+            background: var(--powder);
+            border-color: var(--brand);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .voice-search-btn.listening {
+            background: var(--electric);
+            color: var(--white);
+            border-color: var(--electric);
+            animation: voice-pulse 1.5s infinite;
+        }
+
+        @keyframes voice-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(112, 5, 255, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(112, 5, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(112, 5, 255, 0);
+            }
+        }
+
+        /* Search button uses Electric Violet — lower section color */
+        .search-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--electric);
+            color: var(--white);
+            border: none;
+            border-radius: var(--r);
+            padding: 12px 24px;
+            font-size: .88rem;
+            font-weight: 700;
+            font-family: 'Source Sans 3', sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background var(--t), transform var(--t);
+        }
+
+        .search-btn:hover {
+            background: #5A09C0;
+            transform: scale(1.02);
+        }
+
+        /* ── CONTROLS BAR ─────────────────────────────────── */
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .results-info {
+            font-size: .88rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .results-info strong {
+            color: var(--brand);
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sort-wrap {
+            position: relative;
+        }
+
+        .sort-select {
+            appearance: none;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            padding: 8px 34px 8px 14px;
+            font-size: .82rem;
+            font-family: 'Source Sans 3', sans-serif;
+            color: var(--text);
+            cursor: pointer;
+            outline: none;
+            transition: border-color var(--t);
+        }
+
+        .sort-select:focus {
+            border-color: var(--brand);
+        }
+
+        .sort-caret {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--muted);
+            width: 14px;
+            height: 14px;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .view-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background var(--t), color var(--t);
+        }
+
+        .view-btn.active {
+            background: var(--electric);
+            color: var(--white);
+        }
+
+        /* ── ACTIVE FILTERS BAR ───────────────────────────── */
+        .active-filters-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: var(--pale);
+            border-radius: var(--r);
+            padding: 10px 16px;
+            font-size: .8rem;
+        }
+
+        .active-filters-bar.visible {
+            display: flex;
+        }
+
+        .af-label {
+            font-family: 'Source Sans 3', sans-serif;
+            color: var(--electric);
+            font-weight: 700;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .active-filters {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .active-filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--pale);
+            color: var(--electric);
+            border: 1px solid var(--powder);
+            font-size: .75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 99px;
+        }
+
+        .chip-remove {
+            cursor: pointer;
+            opacity: .6;
+            display: flex;
+            align-items: center;
+            transition: opacity var(--t);
+        }
+
+        .chip-remove:hover {
+            opacity: 1;
+        }
+
+        .af-clear-all {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--electric);
+            font-size: .75rem;
+            font-weight: 700;
+            font-family: 'Source Sans 3', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* ── VIDEO GRID / LIST ────────────────────────────── */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .videos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* ── VIDEO CARD ───────────────────────────────────── */
+        .video-card {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            padding: 24px;
+            box-shadow: var(--sh);
+            border: 1.5px solid transparent;
+            transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Video Thumbnail */
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--r);
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--dark);
+        }
+
+        .video-thumbnail::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--brand);
+            padding-left: 4px;
+            /* Optical alignment for play icon */
+            transition: all var(--t);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-card:hover .play-overlay {
+            background: var(--white);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Unavailable/no-analysis card variant */
+        .video-card.card-unavailable {
+            opacity: 0.65;
+            background: var(--bg);
+            border-color: var(--border);
+        }
+
+        .video-card.card-unavailable:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .card-unavailable-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.68rem;
+            color: var(--muted);
+            background: var(--bg);
+            border: 1px dashed var(--border);
+            padding: 4px 10px;
+            border-radius: 99px;
+        }
+
+        .video-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sh-md);
+            border-color: var(--powder);
+        }
+
+        .video-card-list {
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 18px;
+            padding: 20px 24px;
+        }
+
+        .vc-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .vc-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--pale);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand);
+            flex-shrink: 0;
+        }
+
+        .vc-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .vc-type-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .vc-type {
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .vc-type.academic {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        /* Blue */
+        .vc-type.campus {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        /* Green */
+        .vc-type.facilities {
+            background: #FFEDD5;
+            color: #9A3412;
+        }
+
+        /* Orange */
+        .vc-type.support {
+            background: #FCE7F3;
+            color: #9D174D;
+        }
+
+        /* Pink */
+        .vc-type.admissions {
+            background: #EDE9FE;
+            color: #5B21B6;
+        }
+
+        /* Purple */
+        .vc-type.careers {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        /* Indigo */
+        .vc-type.research {
+            background: #CCFBF1;
+            color: #115E59;
+        }
+
+        /* Teal */
+        .vc-type.events {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* Yellow */
+        .vc-type.accommodation {
+            background: #CFFAFE;
+            color: #164E63;
+        }
+
+        /* Cyan */
+        .vc-type.international {
+            background: #FAE8FF;
+            color: #86198F;
+        }
+
+        /* Fuchsia */
+        .vc-type.university {
+            background: #F3F4F6;
+            color: #4B5563;
+        }
+
+        /* Gray fallback */
+
+        .vc-audience-badge {
+            font-size: .62rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(71, 0, 152, 0.05);
+            color: var(--electric);
+            border: 1px solid rgba(112, 5, 255, 0.15);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .vc-dur {
+            font-size: .68rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .vc-title {
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .vc-divider {
+            height: 1px;
+            background: var(--border);
+        }
+
+        .vc-summary {
+            font-size: .83rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .vc-highlights {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 11px 14px;
+        }
+
+        .vc-hl-title {
+            font-size: .65rem;
+            font-weight: 800;
+            color: var(--brand);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .vc-hl-item {
+            font-size: .78rem;
+            color: var(--text);
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .vc-hl-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--brand);
+            border-radius: 50%;
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        /* ── TRANSCRIPT SNIPPET ── */
+        .vc-transcript-snippet {
+            background: rgba(71, 0, 152, 0.03);
+            border-left: 3px solid var(--powder);
+            padding: 12px 16px;
+            border-radius: 4px 10px 10px 4px;
+            margin: 4px 0;
+            position: relative;
+        }
+
+        .vc-snippet-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--electric);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .vc-snippet-text {
+            font-size: 0.82rem;
+            color: var(--text);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .vc-highlight {
+            background: rgba(112, 5, 255, 0.12);
+            color: var(--brand);
+            font-weight: 700;
+            padding: 0 2px;
+            border-radius: 2px;
+            border-bottom: 2px solid var(--electric);
+        }
+
+        /* ── DETAIL SIDE PANEL ── */
+        .detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 10, 59, 0.45);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--t);
+        }
+
+        .detail-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .detail-panel {
+            width: 100%;
+            max-width: 620px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: -10px 0 50px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .detail-overlay.open .detail-panel {
+            transform: translateX(0);
+        }
+
+        /* Panel Header */
+        .detail-header {
+            padding: 32px 40px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .detail-title-area {
+            flex: 1;
+        }
+
+        .detail-title {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.35;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .detail-close {
+            background: var(--pale);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--brand);
+            transition: background var(--t), transform var(--t);
+        }
+
+        .detail-close:hover {
+            background: var(--powder);
+            transform: rotate(90deg);
+        }
+
+        /* Panel Body Content */
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Video Embed */
+        .detail-video-wrap {
+            width: 100%;
+            min-height: 350px;
+            /* ADD THIS LINE */
+            aspect-ratio: 16/9;
+            background: var(--dark);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            box-shadow: var(--sh-md);
+        }
+
+        .detail-video-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .detail-video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--brand) 0%, var(--electric) 100%);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .detail-video-placeholder a {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 99px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            transition: background var(--t);
+        }
+
+        .detail-video-placeholder a:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .detail-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .detail-info-item {
+            background: var(--bg);
+            padding: 14px 18px;
+            border-radius: var(--r);
+        }
+
+        .detail-info-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+
+        .detail-info-val {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--brand);
+        }
+
+        .detail-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-summary-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Scrollable transcript — fade bottom */
+        .detail-transcript-container {
+            background: var(--bg);
+            border-radius: var(--r-lg);
+            padding: 24px;
+            border: 1px solid var(--border);
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .detail-transcript-container::after {
+            content: '';
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: linear-gradient(to bottom, transparent, var(--bg));
+            display: block;
+            pointer-events: none;
+            margin-top: -48px;
+        }
+
+        .detail-transcript-text {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.8;
+            font-family: 'Source Sans 3', sans-serif;
+            white-space: pre-line;
+        }
+
+        /* Body Scroll Lock */
+        body.detail-open {
+            overflow: hidden;
+        }
+
+        /* ── RESULT TRANSPARENCY ── */
+        .vc-transparency {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .vc-match-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--pale);
+            border: 1px solid rgba(112, 5, 255, 0.12);
+            color: var(--brand);
+            font-size: 0.64rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.01em;
+            transition: var(--t);
+        }
+
+        .vc-match-chip:hover {
+            background: var(--white);
+            border-color: var(--electric);
+            box-shadow: 0 2px 8px rgba(112, 5, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .vc-match-chip i {
+            color: var(--electric);
+        }
+
+        .vc-transparency-label {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-right: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .vc-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .vc-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 99px;
+            font-size: .71rem;
+            font-weight: 500;
+        }
+
+        .vc-tag.building {
+            background: var(--pale);
+            color: var(--brand);
+            border: 1px solid var(--powder);
+        }
+
+        .vc-tag.topic {
+            background: var(--bg);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .vc-transcript-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .68rem;
+            color: var(--muted);
+        }
+
+        /* ── CAMPUS INSIGHTS ── */
+        .insight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .insight-item {
+            cursor: pointer;
+            transition: var(--t);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        .insight-item:hover {
+            background: var(--pale);
+            border-color: rgba(112, 5, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .insight-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .insight-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .insight-count {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--electric);
+            background: rgba(112, 5, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 99px;
+        }
+
+        .insight-bar-wrap {
+            height: 5px;
+            background: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .insight-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--brand), var(--electric));
+            border-radius: 99px;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .insight-rank {
+            font-family: 'Source Serif 4', serif;
+            font-style: italic;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            margin-right: 4px;
+        }
+
+        .video-card-list .vc-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* ── SMART SEARCH / ASK LIBRAI ── */
+        .search-wrap.ai-mode {
+            box-shadow: 0 0 0 3px rgba(112, 5, 255, 0.15), 0 8px 30px rgba(71, 0, 152, 0.1);
+            border-color: var(--electric) !important;
+        }
+
+        .ai-badge {
+            position: absolute;
+            right: 85px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, var(--brand), var(--electric));
+            color: white;
+            font-size: 0.62rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--t);
+            z-index: 5;
+        }
+
+        .search-wrap.ai-mode .ai-badge {
+            opacity: 1;
+        }
+
+        .smart-hint {
+            margin-top: 10px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: var(--t);
+            height: 0;
+            overflow: hidden;
+        }
+
+        .smart-hint.visible {
+            opacity: 1;
+            transform: translateY(0);
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .smart-hint-label {
+            color: var(--electric);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .video-card-list .vc-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        /* ── EMPTY / LOADING ──────────────────────────────── */
+        .state-box {
+            text-align: center;
+            padding: 70px 40px;
+            background: var(--white);
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh);
+        }
+
+        .state-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--pale);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            color: var(--brand);
+        }
+
+        .state-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .state-sub {
+            font-size: .85rem;
+            color: var(--muted);
+        }
+
+        /* ── MODAL ────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 10, 59, .6);
+            backdrop-filter: blur(5px);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--r-xl);
+            padding: 38px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: var(--sh-lg);
+            animation: modalIn .28s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(.94) translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            width: 33px;
+            height: 33px;
+            background: var(--bg);
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--muted);
+            transition: background var(--t), color var(--t);
+        }
+
+        .modal-close:hover {
+            background: var(--pale);
+            color: var(--brand);
+        }
+
+        .modal-desc {
+            font-size: .85rem;
+            color: var(--muted);
+            margin-bottom: 22px;
+            line-height: 1.65;
+        }
+
+        .modal-label {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 7px;
+            display: block;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            font-size: .9rem;
+            font-family: 'Source Sans 3', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            margin-bottom: 14px;
+            transition: border-color var(--t), box-shadow var(--t);
+        }
+
+        .modal-input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(68, 0, 153, .1);
+            background: var(--white);
+        }
+
+        .modal-submit {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            background: var(--brand);
+            color: var(--white);
+            border: none;
+            border-radius: var(--r);
+            padding: 14px;
+            font-size: .95rem;
+            font-weight: 700;
+            font-family: 'Source Sans 3', sans-serif;
+            cursor: pointer;
+            transition: background var(--t);
+        }
+
+        .modal-submit:hover {
+            background: var(--electric);
+        }
+
+        .modal-submit:disabled {
+            background: var(--powder);
+            cursor: not-allowed;
+        }
+
+        .modal-status {
+            display: none;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: .83rem;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        .modal-status.info {
+            background: var(--pale);
+            color: var(--brand);
+            display: flex;
+        }
+
+        .modal-status.success {
+            background: #D1FAE5;
+            color: var(--success);
+            display: flex;
+        }
+
+        .modal-status.error {
+            background: #FEE2E2;
+            color: var(--error);
+            display: flex;
+        }
+
+        .modal-progress {
+            height: 5px;
+            background: var(--pale);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .modal-progress.active {
+            display: block;
+        }
+
+        .modal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--brand), var(--electric));
+            border-radius: 99px;
+            transition: width .5s ease;
+        }
+
+        /* ── FOOTER ───────────────────────────────────────── */
+        .footer {
+            background: var(--dark);
+            padding: 38px 48px;
+        }
+
+        .footer-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            height: 36px;
+            width: auto;
+            filter: brightness(0) invert(1);
+            opacity: .55;
+        }
+
+        .footer-txt {
+            color: var(--powder);
+            font-size: .82rem;
+            line-height: 1.65;
+        }
+
+        .footer-txt strong {
+            color: var(--white);
+        }
+
+        .footer-right {
+            font-size: .75rem;
+            color: rgba(196, 181, 253, .5);
+            text-align: right;
+            line-height: 1.7;
+        }
+
+        /* ── SPINNER ──────────────────────────────────────── */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin .9s linear infinite;
+        }
+
+        /* ── RESPONSIVE ───────────────────────────────────── */
+        @media(max-width:1100px) {
+            .main {
+                grid-template-columns: 240px 1fr;
+            }
+
+            .diff-inner {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .diff-item:nth-child(2) {
+                border-right: none;
+            }
+
+            .nav,
+            .hero,
+            .diff-section,
+            .footer {
+                padding-left: 28px;
+                padding-right: 28px;
+            }
+
+            .main {
+                padding-left: 28px;
+                padding-right: 28px;
+            }
+
+            .hero-graphic {
+                grid-template-columns: repeat(2, 1fr);
+                width: 260px;
+            }
+        }
+
+        @media(max-width:820px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .hero-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-graphic {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .diff-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .diff-item {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, .12);
+            }
+
+            .nav {
+                height: 70px;
+                padding: 0 20px;
+            }
+
+            .nav-sheffield-logo {
+                height: 40px;
+            }
+
+            .nav-divider {
+                height: 32px;
+                margin: 0 14px;
+            }
+
+            .nav-librai-name {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── NAV ───────────────────────────────────────── -->
+    <!--
+      Single brand violet bar. White transparent logo (UOSLogo_Primary_White_RGB.png)
+      blends directly with the background — no white box, no panel, no filter.
+    -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a class="nav-brand" href="#" aria-label="LibrAI — University of Sheffield">
+                <!-- White Sheffield logo on transparent background — blends naturally with brand violet -->
+                <img src="assets/UOSLogo_Primary_White_RGB.png" alt="University of Sheffield"
+                    class="nav-sheffield-logo">
+                <div class="nav-divider" aria-hidden="true"></div>
+                <div class="nav-librai">
+                    <span class="nav-librai-eyebrow">Data &amp; Design Hackathon 2026</span>
+                    <span class="nav-librai-name">LibrAI</span>
+                    <span class="nav-librai-sub">Official Team Entry</span>
+                </div>
+            </a>
+            <div class="nav-right">
+                <span class="nav-pill" aria-hidden="true">Video Discovery</span>
+                <button class="nav-add-btn" onclick="openModal()" id="nav-add-btn" aria-label="Add new video">
+                    <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+                    Add Video
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── HERO ─────────────────────────────────────────── -->
+    <header class="hero" role="banner">
+        <div class="hero-inner">
+            <div>
+                <div class="hero-eyebrow">
+                    <i data-lucide="award" style="width:12px;height:12px;"></i>
+                    Data &amp; Design Hackathon 2026 &middot; Team LibrAI
+                </div>
+                <h1 class="hero-title">LibrAI &mdash; Video<br><span>Intelligence Platform</span></h1>
+                <p class="hero-sub">Developed for the 2026 Data &amp; Design Hackathon, LibrAI automatically
+                    transcribes, analyses and indexes university videos
+                    using Whisper AI — providing a zero-cost knowledge exploration tool for Sheffield.</p>
+                <div class="hero-tags">
+                    <span class="hero-tag"><i data-lucide="mic" style="width:14px;height:14px;"></i>Whisper AI
+                        Transcription</span>
+                    <span class="hero-tag"><i data-lucide="search" style="width:14px;height:14px;"></i>Full-Text
+                        Search</span>
+                    <span class="hero-tag"><i data-lucide="building-2" style="width:14px;height:14px;"></i>Location
+                        Intelligence</span>
+                    <span class="hero-tag"><i data-lucide="brain-circuit" style="width:14px;height:14px;"></i>AI
+                        Summaries</span>
+                </div>
+                <a href="#discovery" class="hero-cta">
+                    <i data-lucide="play-circle" style="width:18px;height:18px;"></i>
+                    Explore the Library
+                </a>
+            </div>
+            <div class="hero-graphic" aria-hidden="true">
+                <div class="stat-badge" title="Videos transcribed and indexed by LibrAI">
+                    <div class="stat-badge-num" id="h-videos">0</div>
+                    <div class="stat-badge-lbl">Videos Analyzed</div>
+                </div>
+                <div class="stat-badge" title="Unique campus buildings detected in speech">
+                    <div class="stat-badge-num" id="h-buildings">0</div>
+                    <div class="stat-badge-lbl">Buildings ID'd</div>
+                </div>
+                <div class="stat-badge" title="AI accuracy on Whisper transcription">
+                    <div class="stat-badge-num">95%+</div>
+                    <div class="stat-badge-lbl">AI Accuracy</div>
+                </div>
+                <div class="stat-badge impact-badge" title="Estimated manual transcription hours saved">
+                    <div class="stat-badge-num" id="h-hours">0</div>
+                    <div class="stat-badge-lbl">Hours Saved</div>
+                </div>
+                <div class="stat-badge impact-badge" title="Total spoken words indexed for search">
+                    <div class="stat-badge-num" id="h-words">0</div>
+                    <div class="stat-badge-lbl">Words Indexed</div>
+                </div>
+                <div class="stat-badge impact-badge" title="Estimated cost of manual transcription avoided">
+                    <div class="stat-badge-num" id="h-savings">£0</div>
+                    <div class="stat-badge-lbl">Cost Saved</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── DIFFERENTIATORS ────────────────────────────── -->
+    <section class="diff-section" aria-label="Key differentiators">
+        <div class="diff-inner">
+            <div class="diff-item">
+                <div class="diff-icon"><i data-lucide="mic" style="width:18px;height:18px;"></i></div>
+                <div>
+                    <div class="diff-label">Whisper AI Transcription</div>
+                    <div class="diff-desc">95–98% accuracy. Every spoken word indexed for instant full-text search.
+                    </div>
+                </div>
+            </div>
+            <div class="diff-item">
+                <div class="diff-icon"><i data-lucide="brain-circuit" style="width:18px;height:18px;"></i></div>
+                <div>
+                    <div class="diff-label">Intelligent Summarisation</div>
+                    <div class="diff-desc">AI-generated summaries with subject, year, speaker and topic detection.</div>
+                </div>
+            </div>
+            <div class="diff-item">
+                <div class="diff-icon"><i data-lucide="map-pin" style="width:18px;height:18px;"></i></div>
+                <div>
+                    <div class="diff-label">Location Intelligence</div>
+                    <div class="diff-desc">Automatically identifies Sheffield campus buildings mentioned in video
+                        speech.</div>
+                </div>
+            </div>
+            <div class="diff-item">
+                <div class="diff-icon"><i data-lucide="pound-sterling" style="width:18px;height:18px;"></i></div>
+                <div>
+                    <div class="diff-label">Zero Running Cost</div>
+                    <div class="diff-desc">Fully open-source stack. Processing 200 videos costs £0 vs £10,000+ manually.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MAIN DISCOVERY ──────────────────────────────── -->
+    <main id="discovery">
+        <div class="main">
+
+            <!-- SIDEBAR -->
+            <aside class="sidebar" role="complementary" aria-label="Filters and statistics">
+                <div class="sidebar-card">
+                    <div class="sidebar-card-title">
+                        <i data-lucide="sliders-horizontal" style="width:14px;height:14px;"></i>
+                        Filters
+                        <button class="sidebar-clear" onclick="clearAllFilters()">Clear all</button>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-group-title">Content Type</div>
+                        <div id="filter-type"></div>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-group-title">Building / Location</div>
+                        <div id="filter-building"></div>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-group-title">Academic Subject</div>
+                        <div id="filter-topic"></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-card-title">
+                        <i data-lucide="bar-chart-2" style="width:14px;height:14px;"></i>
+                        Library Stats
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:11px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:.8rem;color:var(--muted);">Videos processed</span>
+                            <span style="font-size:.9rem;font-weight:700;color:var(--brand);" id="sb-videos">—</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:.8rem;color:var(--muted);">Buildings detected</span>
+                            <span style="font-size:.9rem;font-weight:700;color:var(--brand);" id="sb-buildings">—</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:.8rem;color:var(--muted);">Topics identified</span>
+                            <span style="font-size:.9rem;font-weight:700;color:var(--brand);" id="sb-topics">—</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:.8rem;color:var(--muted);">Words transcribed</span>
+                            <span style="font-size:.9rem;font-weight:700;color:var(--brand);" id="sb-words">—</span>
+                        </div>
+                        <div style="height:1px;background:var(--border);"></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:.8rem;color:var(--muted);">API cost</span>
+                            <span style="font-size:.9rem;font-weight:800;color:var(--success);">£0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Campus Insights -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-title">
+                        <i data-lucide="building-2" style="width:14px;height:14px;"></i>
+                        Campus Insights
+                    </div>
+                    <p style="font-size:0.7rem;color:var(--muted);margin-bottom:12px;line-height:1.3;">Top mentioned
+                        Sheffield locations in this knowledge base.</p>
+                    <div id="building-insights" class="insight-list">
+                        <!-- Injected by updateBuildingInsights() -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CONTENT AREA -->
+            <div class="content-area">
+
+                <div class="section-header">
+                    <div class="section-header-title">Video Library</div>
+                    <div class="section-header-badge" id="section-count-badge">Loading...</div>
+                </div>
+
+                <div class="search-bar" role="search">
+                    <div class="search-wrap" id="search-wrap">
+                        <i data-lucide="search" class="search-icon" aria-hidden="true"></i>
+                        <input type="search" class="search-input" id="search-input"
+                            placeholder="Ask LibrAI (e.g. 'Videos about the Diamond' or 'Engineering')..."
+                            aria-label="Search videos" style="padding-right: 140px;">
+                        <div class="ai-badge" id="ai-badge">
+                            <i data-lucide="sparkles" style="width:10px;height:10px;"></i>
+                            Smart Mode
+                        </div>
+                        <button class="voice-search-btn" id="voice-search-btn" onclick="toggleVoiceSearch()"
+                            title="Voice Search">
+                            <i data-lucide="mic" style="width:16px;height:16px;"></i>
+                        </button>
+                    </div>
+                    <button class="search-btn" onclick="applyAll()">
+                        <i data-lucide="search" style="width:15px;height:15px;"></i>Search
+                    </button>
+                </div>
+                <div id="smart-hint" class="smart-hint"></div>
+
+                <div class="controls-bar">
+                    <div class="results-info" id="results-info">Loading videos...</div>
+                    <div class="controls-right">
+                        <div class="sort-wrap">
+                            <select class="sort-select" id="sort-select" onchange="applyAll()" aria-label="Sort by">
+                                <option value="default">Sort: Relevance</option>
+                                <option value="alpha-az">Sort: A to Z</option>
+                                <option value="alpha-za">Sort: Z to A</option>
+                                <option value="recent">Sort: Most Recent</option>
+                                <option value="words-desc">Sort: Longest First</option>
+                                <option value="topic">Sort: By Subject</option>
+                                <option value="type">Sort: By Category</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="sort-caret"></i>
+                        </div>
+                        <div class="view-toggle" role="group" aria-label="View mode">
+                            <button class="view-btn active" id="btn-grid" onclick="setView('grid')" title="Grid view"
+                                aria-pressed="true">
+                                <i data-lucide="layout-grid" style="width:15px;height:15px;"></i>
+                            </button>
+                            <button class="view-btn" id="btn-list" onclick="setView('list')" title="List view"
+                                aria-pressed="false">
+                                <i data-lucide="list" style="width:15px;height:15px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="active-filters-bar" id="active-filters-bar" role="status">
+                    <span class="af-label">Filtered by:</span>
+                    <div id="af-chips" class="active-filters"></div>
+                    <button class="af-clear-all" onclick="clearAllFilters()">Clear all</button>
+                </div>
+
+                <div id="videos-container" role="list" aria-live="polite" aria-label="Video results">
+                    <div class="state-box">
+                        <div class="state-icon"><i data-lucide="loader" style="width:26px;height:26px;"
+                                class="spin"></i></div>
+                        <div class="state-title">Loading video library...</div>
+                        <div class="state-sub">Connecting to the API</div>
+                    </div>
+                </div>
+
+            </div><!-- /content-area -->
+        </div><!-- /main grid -->
+    </main>
+
+    <!-- ── FOOTER ────────────────────────────────────── -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <img src="assets/sheffield-logo.svg" alt="University of Sheffield" class="footer-logo">
+                <div class="footer-txt">
+                    <strong>LibrAI</strong> &mdash; <strong>Team LibrAI</strong> Entry<br>
+                    <span style="opacity:.65">Data &amp; Design Hackathon 2026 &middot; University of Sheffield</span>
+                </div>
+            </div>
+            <div class="footer-right">
+                Developed for the <strong>Data &amp; Design Hackathon 2026</strong><br>
+                Powered by OpenAI Whisper &middot; Python &middot; Flask &middot; Sheffield Brand Assets
+            </div>
+        </div>
+    </footer>
+
+    <!-- ── ADD VIDEO MODAL ────────────────────────────── -->
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Add new video"
+        onclick="handleOverlayClick(event)">
+        <div class="modal">
+            <div class="modal-head">
+                <div style="display:flex;align-items:center;gap:11px;">
+                    <div
+                        style="width:38px;height:38px;background:var(--pale);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--brand);">
+                        <i data-lucide="upload-cloud" style="width:19px;height:19px;"></i>
+                    </div>
+                    <span class="modal-title">Add New Video</span>
+                </div>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close">
+                    <i data-lucide="x" style="width:16px;height:16px;"></i>
+                </button>
+            </div>
+            <p class="modal-desc">Paste a University of Sheffield YouTube URL. LibrAI will automatically download,
+                transcribe with Whisper AI, extract metadata, and add it to the searchable library.</p>
+            <label class="modal-label" for="youtube-url">YouTube URL</label>
+            <input type="url" class="modal-input" id="youtube-url" placeholder="https://www.youtube.com/watch?v=..."
+                aria-required="true">
+            <button class="modal-submit" id="modal-submit-btn" onclick="addVideo()">
+                <i data-lucide="upload-cloud" style="width:17px;height:17px;" id="submit-icon"></i>
+                <span id="submit-label">Add &amp; Process Video</span>
+            </button>
+            <div id="modal-status" class="modal-status" role="status" aria-live="polite"></div>
+            <div id="modal-progress" class="modal-progress">
+                <div id="modal-progress-fill" class="modal-progress-fill" style="width:0%"></div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- ── VIDEO DETAIL PANEL ─────────────────────────── -->
+    <div id="detail-overlay" class="detail-overlay" onclick="closeDetail()">
+        <div id="detail-panel" class="detail-panel" onclick="event.stopPropagation()">
+            <!-- Content injected dynamically via JS: openDetail() -->
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons(); let allVideos = [], currentView = 'grid';
+        let activeFilters = { type: new Set(), building: new Set(), topic: new Set() };
+        let transcriptCache = {};
+        let currentTaskId = null, statusInterval = null;
+        const API = 'http://localhost:5001';
+        const TYPE_CLASSES = { 'Academic': 'academic', 'Campus Life': 'campus', 'Facilities': 'facilities', 'Student Support': 'support', 'Admissions': 'admissions', 'Careers': 'careers', 'Research': 'research', 'Events': 'events', 'Accommodation': 'accommodation', 'International Student Experience': 'international' };
+
+        function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        function fmtDur(s) { if (!s) return ''; const m = Math.round(s / 60); return m > 0 ? `~${m}min` : '~1min'; }
+        function fmtWords(n) { return n >= 1000 ? `${Math.round(n / 100) / 10}k` : String(n); }
+
+        function getSnippet(text, term) {
+            if (!text || !term) return null;
+            const cleanText = text.replace(/\s+/g, ' ');
+            const idx = cleanText.toLowerCase().indexOf(term.toLowerCase());
+            if (idx === -1) return null;
+
+            const start = Math.max(0, idx - 60);
+            const end = Math.min(cleanText.length, idx + term.length + 100);
+            let snippet = cleanText.substring(start, end);
+
+            if (start > 0) snippet = '...' + snippet;
+            if (end < cleanText.length) snippet = snippet + '...';
+
+            // Highlight the term
+            const regex = new RegExp(`(${term})`, 'gi');
+            return snippet.replace(regex, '<span class="vc-highlight">$1</span>');
+        }
+
+        async function preloadTranscripts() {
+            // Batch fetch transcripts in background
+            for (const v of allVideos) {
+                if (transcriptCache[v.video_file] !== undefined) continue;
+                try {
+                    const r = await fetch(`${API}/api/transcript/${v.video_file}`);
+                    if (r.ok) {
+                        const d = await r.json();
+                        transcriptCache[v.video_file] = d.transcription || '';
+                    } else {
+                        transcriptCache[v.video_file] = '';
+                    }
+                } catch (e) {
+                    transcriptCache[v.video_file] = '';
+                    console.warn(`Failed to load transcript for ${v.video_file}`);
+                }
+            }
+        }
+
+        function extractYTId(filename) {
+            // Format: YYYYMMDD_ID (e.g. 20230120_BoIZJjrKW-4)
+            const parts = filename.split('_');
+            if (parts.length < 2) return null;
+            // The ID is the rest of the string after the first underscore
+            return parts.slice(1).join('_');
+        }
+
+        function openDetail(vFile) {
+            const v = allVideos.find(vid => vid.video_file === vFile);
+            if (!v) return;
+
+            // Human-readable title from AI summary, same logic as card
+            const dateStr = v.video_file ? v.video_file.substring(0, 8) : '';
+            const dateLabel = dateStr.length === 8 ? `${dateStr.slice(0, 4)}/${dateStr.slice(4, 6)}` : '';
+            const isPlaceholder = !v.ai_summary || v.ai_summary.includes('not available for analysis') || v.ai_summary.includes('Limited transcript quality');
+            const summaryWords = (v.ai_summary || '').split(' ');
+            const panelTitle = !isPlaceholder
+                ? summaryWords.slice(0, 12).join(' ') + (summaryWords.length > 12 ? '\u2026' : '')
+                : `${v.content_type || 'Video'} \u2014 ${dateLabel}`;
+
+            const ytId = extractYTId(v.video_file);
+            const ytUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : null;
+
+            let transcriptText = transcriptCache[v.video_file];
+            if (transcriptText === undefined) {
+                transcriptText = 'Transcript loading... Please wait.';
+            } else if (!transcriptText || transcriptText.trim() === '') {
+                transcriptText = 'Transcript unavailable for this video.';
+            }
+
+            const dur = fmtDur(v.duration_estimate);
+            const tc = TYPE_CLASSES[v.content_type] || 'university';
+            const audience = deriveAudience(v);
+            const audienceBadge = audience ? `<span class="vc-audience-badge" title="Perfect For: Indicates likely target audience"><i data-lucide="users" style="width:11px;height:11px;"></i>Perfect for: ${esc(audience)}</span>` : '';
+
+            const panel = document.getElementById('detail-panel');
+            panel.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-title-area">
+                        <div class="vc-type-row">
+                            <span class="vc-type ${tc}">${esc(v.content_type)}</span>
+                            ${dur ? `<span class="vc-dur"><i data-lucide="clock" style="width:11px;height:11px;"></i>${dur}</span>` : ''}
+                            ${audienceBadge}
+                        </div>
+                        <h2 class="detail-title">${esc(panelTitle)}</h2>
+                    </div>
+                    <button class="detail-close" onclick="closeDetail()" aria-label="Close panel">
+                        <i data-lucide="x" style="width:18px;height:18px;"></i>
+                    </button>
+                </div>
+                <div class="detail-body">
+                    <div class="detail-video-wrap">
+                        ${ytId ?
+                    `<iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen title="${esc(panelTitle)}"></iframe>` :
+                    `<video controls style="width: 100%; height: 100%; background: #000;">
+    			     <source src="videos/${v.video_file}.mp4" type="video/mp4">
+    Your browser does not support video playback.
+			</video>`
+                }
+                    </div>
+
+                    <div class="detail-info-grid">
+                        <div class="detail-info-item">
+                            <div class="detail-info-label">Building / Location</div>
+                            <div class="detail-info-val">${(v.buildings || []).join(', ') || 'N/A'}</div>
+                        </div>
+                        <div class="detail-info-item">
+                            <div class="detail-info-label">Academic Subject</div>
+                            <div class="detail-info-val">${(v.topics || []).join(', ') || 'N/A'}</div>
+                        </div>
+                        ${(v.themes && v.themes.length > 0) ? `
+                        <div class="detail-info-item" style="grid-column: 1 / -1;">
+                            <div class="detail-info-label">Student Life Themes</div>
+                            <div class="detail-info-val" style="color:var(--electric); font-weight:600;">${v.themes.join(' • ')}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <i data-lucide="sparkles" style="width:13px;height:13px;color:var(--electric);"></i>
+                            AI Summary
+                        </div>
+                        <div class="detail-summary-text">${esc(v.ai_summary)}</div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <i data-lucide="file-text" style="width:13px;height:13px;color:var(--electric);"></i>
+                            Full AI Transcript
+                        </div>
+                        <div class="detail-transcript-container">
+                            <div class="detail-transcript-text">${esc(transcriptText)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detail-overlay').classList.add('open');
+            document.body.classList.add('detail-open');
+            lucide.createIcons();
+            // Fetch transcript for this specific video if not cached
+            if (transcriptCache[v.video_file] === undefined) {
+                transcriptCache[v.video_file] = 'Loading...';
+                fetch(`${API}/api/transcript/${v.video_file}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        transcriptCache[v.video_file] = d.transcription || '';
+                        // Update only the transcript section, don't refresh entire page
+                        const transcriptEl = document.querySelector('.detail-transcript-text');
+                        if (transcriptEl) {
+                            transcriptEl.textContent = transcriptCache[v.video_file];
+                        }
+                    })
+                    .catch(() => {
+                        transcriptCache[v.video_file] = '';
+                    });
+            }
+        }
+
+        function closeDetail() {
+            document.getElementById('detail-overlay').classList.remove('open');
+            document.body.classList.remove('detail-open');
+            // Stop video by clearing panel after animation
+            setTimeout(() => {
+                if (!document.getElementById('detail-overlay').classList.contains('open')) {
+                    document.getElementById('detail-panel').innerHTML = '';
+                }
+            }, 400);
+        }
+
+        async function loadVideos() {
+            try {
+                const r = await fetch(`${API}/api/videos?_t=${Date.now()}`);
+                allVideos = await r.json();
+                buildFilters(); updateStats(); applyAll();
+                // preloadTranscripts(); // Disabled - causes videos to disappear
+            } catch (e) {
+                document.getElementById('videos-container').innerHTML = `<div class="state-box"><div class="state-icon"><i data-lucide="wifi-off" style="width:26px;height:26px;"></i></div><div class="state-title">Cannot reach API server</div><div class="state-sub">Run <code>python3 api_server.py</code> then refresh</div></div>`;
+                document.getElementById('results-info').textContent = 'Server offline';
+                lucide.createIcons();
+            }
+        }
+
+        function updateStats() {
+            const buildings = new Set(allVideos.flatMap(v => v.buildings || []));
+            const topics = new Set(allVideos.flatMap(v => v.topics || []));
+            const totalWords = allVideos.reduce((a, v) => a + (v.transcript_length || 0), 0);
+            const totalSecs = allVideos.reduce((a, v) => a + (v.duration_estimate || 0), 0);
+
+            // 4.0x multiplier for manual transcription time saved
+            const hoursSaved = Math.round((totalSecs * 4.0) / 3600);
+
+            // ✅ WORD-BASED PRICING: £0.077 per word (industry standard)
+            const costSaved = Math.round(totalWords * 0.077);
+
+            animNum('h-videos', allVideos.length);
+            animNum('h-buildings', buildings.size);
+            animNum('h-hours', hoursSaved, '', 'h');
+            animNum('h-words', totalWords, '', '', true);
+            animNum('h-savings', costSaved, '£');
+
+            set('sb-videos', allVideos.length);
+            set('sb-buildings', buildings.size);
+            set('sb-topics', topics.size);
+            set('sb-words', fmtWords(totalWords));
+
+            updateBuildingInsights();
+        }
+
+        function updateBuildingInsights() {
+            const counts = new Map();
+            allVideos.forEach(v => {
+                (v.buildings || []).forEach(b => {
+                    counts.set(b, (counts.get(b) || 0) + 1);
+                });
+            });
+
+            const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const container = document.getElementById('building-insights');
+            if (!container || !sorted.length) {
+                if (container) container.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);font-style:italic;">No building data available yet.</div>';
+                return;
+            }
+
+            const max = sorted[0][1];
+            container.innerHTML = sorted.map(([name, count], i) => `
+                <div class="insight-item" onclick="quickFilterBuilding('${name.replace(/'/g, "\\'")}')" title="Filter results by ${esc(name)}">
+                    <div class="insight-row">
+                        <div class="insight-name">
+                            <span class="insight-rank">#${i + 1}</span>
+                            <i data-lucide="map-pin" style="width:12px;height:12px;opacity:0.6;"></i>
+                            ${esc(name)}
+                        </div>
+                        <div class="insight-count">${count} mention${count !== 1 ? 's' : ''}</div>
+                    </div>
+                    <div class="insight-bar-wrap">
+                        <div class="insight-bar" style="width: 0%" data-target="${Math.round((count / max) * 100)}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+            // Animate bars
+            setTimeout(() => {
+                container.querySelectorAll('.insight-bar').forEach(bar => {
+                    bar.style.width = bar.dataset.target;
+                });
+            }, 100);
+        }
+
+        function quickFilterBuilding(name) {
+            clearAllFilters();
+            activeFilters.building.add(name);
+            buildFilters(); // Redraw filter list to show active state
+            applyAll();
+            // Scroll to discovery
+            document.getElementById('discovery').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function animNum(id, target, prefix = '', suffix = '', useFmt = false) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const d = 1000, s = Date.now();
+            const tick = () => {
+                const p = Math.min((Date.now() - s) / d, 1);
+                const val = Math.round(p * target);
+                const display = useFmt ? fmtWords(val) : val.toLocaleString();
+                el.textContent = prefix + display + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        }
+        function set(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+
+        function buildFilters() {
+            const types = new Map(), buildings = new Map(), topics = new Map();
+            allVideos.forEach(v => {
+                const t = v.content_type || 'Unknown'; types.set(t, (types.get(t) || 0) + 1);
+                (v.buildings || []).forEach(b => buildings.set(b, (buildings.get(b) || 0) + 1));
+                (v.topics || []).forEach(t => topics.set(t, (topics.get(t) || 0) + 1));
+            });
+            renderFG('filter-type', types, 'type');
+            renderFG('filter-building', buildings, 'building');
+            renderFG('filter-topic', topics, 'topic');
+        }
+        function renderFG(cid, map, key) {
+            document.getElementById(cid).innerHTML = [...map.entries()].sort((a, b) => b[1] - a[1]).map(([val, cnt]) => `
+    <label class="filter-opt${activeFilters[key].has(val) ? ' active' : ''}" id="fo-${key}-${CSS.escape(val)}">
+      <input type="checkbox" ${activeFilters[key].has(val) ? 'checked' : ''} onchange="toggleFilter('${key}','${val.replace(/'/g, "\\'")}',this)">
+      <span class="filter-opt-label">${esc(val)}</span>
+      <span class="filter-opt-count">${cnt}</span>
+    </label>`).join('');
+        }
+        function toggleFilter(key, val, cb) {
+            if (cb.checked) activeFilters[key].add(val); else activeFilters[key].delete(val);
+            cb.closest('.filter-opt')?.classList.toggle('active', cb.checked);
+            applyAll();
+        }
+        function interpretQuery(query) {
+            if (!query || query.length < 3) return null;
+            const q = query.toLowerCase();
+            const isQuestion = q.includes('?') || q.startsWith('show') || q.startsWith('which') || q.startsWith('what') || q.split(' ').length > 2;
+
+            if (!isQuestion) return null;
+
+            const detected = { building: [], topic: [], type: [], intent: false, refinedTerm: query };
+
+            // CLEAN FILLER: Extract the semantic subject
+            const fillers = [
+                "show me videos about", "search for videos mentioning", "what videos talk about",
+                "find videos on", "videos about", "videos on", "which videos mention",
+                "videos regarding", "videos that mention", "videos with", "tell me about",
+                "subject about", "subjects about", "video about", "content about",
+                "find me", "show me", "search for", "looking for", "i want", "i need",
+                "can you find", "help me find", "get me"
+            ];
+
+            let core = q;
+            fillers.forEach(f => { if (core.startsWith(f)) core = core.replace(f, '').trim(); });
+            // Strip trailing question marks
+            core = core.replace(/\?$/, '').trim();
+            detected.refinedTerm = core;
+
+            // 1. Buildings (Use the original query to detect entities)
+            const buildings = ["The Wave", "Diamond", "Arts Tower", "Students Union", "Information Commons", "Firth Court", "Western Bank Library"];
+            buildings.forEach(b => {
+                if (q.includes(b.toLowerCase())) {
+                    detected.building.push(b);
+                    detected.intent = true;
+                    core = core.replace(b.toLowerCase(), '').trim(); // Remove from keyword if filter set
+                }
+            });
+
+            // 2. Topics
+            const topics = ["Engineering", "Sociology", "Mathematics", "Science", "Arts", "Computer Science", "Medicine", "Law", "Business", "Psychology", "History"];
+            topics.forEach(t => {
+                if (q.includes(t.toLowerCase())) {
+                    detected.topic.push(t);
+                    detected.intent = true;
+                    core = core.replace(t.toLowerCase(), '').trim(); // Remove from keyword if filter set
+                }
+                // Special plurals/variations
+                if (t === 'Arts' && q.includes('art')) {
+                    detected.topic.push(t);
+                    detected.intent = true;
+                    core = core.split(' ').filter(word => !word.startsWith('art')).join(' ').trim();
+                }
+            });
+
+            // 3. Types (Categories)
+            const types = { 'day in the life': 'Day in the Life', 'life': 'Day in the Life', 'student life': 'Day in the Life', 'tour': 'Campus Tour', 'course': 'Course Information', 'research': 'Research Showcase' };
+            Object.entries(types).forEach(([k, v]) => {
+                if (q.includes(k)) {
+                    detected.type.push(v);
+                    detected.intent = true;
+                    core = core.replace(k, '').trim(); // Remove from keyword if filter set
+                }
+            });
+
+            // Clean up remaining generic words if we detected filters
+            if (detected.building.length || detected.topic.length || detected.type.length) {
+                // Remove common generic words that add no search value
+                const genericWords = ['subject', 'subjects', 'video', 'videos', 'about', 'on', 'regarding', 'related to', 'concerning'];
+                let words = core.split(' ').filter(word => {
+                    const cleanWord = word.toLowerCase().trim();
+                    return cleanWord.length > 0 && !genericWords.includes(cleanWord);
+                });
+                core = words.join(' ').trim();
+            }
+
+
+            detected.refinedTerm = core;
+
+            // If we have a refined term but no specific building/topic detected, it's still an intent!
+            if (detected.refinedTerm !== q) detected.intent = true;
+
+            if (!detected.intent) return null;
+
+            // Apply filters automatically (unless we're just refining the term)
+            if (detected.building.length || detected.topic.length || detected.type.length) {
+                clearAllFilters(false); // Clear silently
+                detected.building.forEach(b => activeFilters.building.add(b));
+                detected.topic.forEach(t => activeFilters.topic.add(t));
+                detected.type.forEach(ty => activeFilters.type.add(ty));
+                buildFilters(); // Sync UI
+            }
+
+            return detected;
+        }
+
+        function updateSmartHint(interp) {
+            const wrap = document.getElementById('search-wrap');
+            const hint = document.getElementById('smart-hint');
+            if (!interp || !interp.intent) {
+                wrap.classList.remove('ai-mode');
+                hint.classList.remove('visible');
+                return;
+            }
+
+            wrap.classList.add('ai-mode');
+            const parts = [];
+            if (interp.building.length) parts.push(`located at <strong>${interp.building.join(', ')}</strong>`);
+            if (interp.topic.length) parts.push(`about <strong>${interp.topic.join(', ')}</strong>`);
+            if (interp.type.length) parts.push(`categorized as <strong>${interp.type.join(', ')}</strong>`);
+
+            // If only a refined term exists, show that
+            let message = `Searching for videos ${parts.join(' and ')}.`;
+            if (parts.length === 0 && interp.refinedTerm) {
+                message = `Searching for <strong>"${interp.refinedTerm}"</strong>.`;
+            }
+
+            hint.innerHTML = `
+                <span class="smart-hint-label"><i data-lucide="sparkles" style="width:14px;height:14px;"></i> Ask LibrAI Content Awareness:</span>
+                ${message}
+            `;
+            hint.classList.add('visible');
+            lucide.createIcons();
+        }
+
+        function clearAllFilters(reapply = true) {
+            Object.keys(activeFilters).forEach(k => activeFilters[k].clear());
+            if (reapply) {
+                document.getElementById('search-input').value = '';
+                buildFilters(); applyAll();
+            }
+        }
+        function applyAll() {
+            const raw = document.getElementById('search-input').value.trim();
+            const interpretation = interpretQuery(raw);
+            updateSmartHint(interpretation);
+
+            // USE REFINED TERM IF AVAILABLE
+            const term = (interpretation && interpretation.refinedTerm) ? interpretation.refinedTerm.toLowerCase() : raw.toLowerCase();
+            const sort = document.getElementById('sort-select').value;
+
+            let results = allVideos.filter(v => {
+                if (activeFilters.type.size && !activeFilters.type.has(v.content_type)) return false;
+                if (activeFilters.building.size && !(v.buildings || []).some(b => activeFilters.building.has(b))) return false;
+                if (activeFilters.topic.size && !(v.topics || []).some(t => activeFilters.topic.has(t))) return false;
+
+                v.transcriptMatch = null;
+                v.matchReasons = [];
+
+                if (!term) return true; // No search term, show everything (respecting filters)
+
+                // Track matches for transparency
+                if (v.video_file.toLowerCase().includes(term)) v.matchReasons.push('Title');
+                if ((v.ai_summary || '').toLowerCase().includes(term)) v.matchReasons.push('Summary');
+                if ((v.buildings || []).some(b => b.toLowerCase().includes(term))) v.matchReasons.push('Building');
+                if ((v.topics || []).some(t => t.toLowerCase().includes(term))) v.matchReasons.push('Subject');
+                if ((v.key_points || []).some(k => k.toLowerCase().includes(term))) v.matchReasons.push('Key Points');
+
+                // Search transcript
+                const transcript = transcriptCache[v.video_file];
+                if (transcript) {
+                    const snippet = getSnippet(transcript, term);
+                    if (snippet) {
+                        v.transcriptMatch = snippet;
+                        v.matchReasons.push('Transcript');
+                    }
+                }
+
+                return v.matchReasons.length > 0;
+            });
+            switch (sort) {
+                case 'alpha-az': results.sort((a, b) => a.video_file.localeCompare(b.video_file)); break;
+                case 'alpha-za': results.sort((a, b) => b.video_file.localeCompare(a.video_file)); break;
+                case 'recent': results.sort((a, b) => (b.processed_at || 0) - (a.processed_at || 0)); break;
+                case 'words-desc': results.sort((a, b) => (b.transcript_length || 0) - (a.transcript_length || 0)); break;
+                case 'topic': results.sort((a, b) => ((a.topics || [])[0] || '').localeCompare((b.topics || [])[0] || '')); break;
+                case 'type': results.sort((a, b) => (a.content_type || '').localeCompare(b.content_type || '')); break;
+            }
+            updateAFBar(term); renderVideos(results);
+        }
+        function updateAFBar(term) {
+            const hasF = Object.values(activeFilters).some(s => s.size > 0) || term;
+            document.getElementById('active-filters-bar').classList.toggle('visible', !!hasF);
+            if (!hasF) { document.getElementById('af-chips').innerHTML = ''; return; }
+            const chips = [];
+            if (term) chips.push(`<span class="active-filter-chip">Search: "${esc(term)}" <span class="chip-remove" onclick="clearSearch()"><i data-lucide="x" style="width:11px;height:11px;"></i></span></span>`);
+            Object.entries(activeFilters).forEach(([key, set]) => { set.forEach(val => chips.push(`<span class="active-filter-chip">${esc(val)} <span class="chip-remove" onclick="removeFilter('${key}','${val.replace(/'/g, "\\'")}')"><i data-lucide="x" style="width:11px;height:11px;"></i></span></span>`)); });
+            document.getElementById('af-chips').innerHTML = chips.join(''); lucide.createIcons();
+        }
+        function clearSearch() { document.getElementById('search-input').value = ''; applyAll(); }
+        function removeFilter(key, val) {
+            activeFilters[key].delete(val);
+            const id = `fo-${key}-${CSS.escape(val)}`;
+            const lbl = document.getElementById(id);
+            if (lbl) { lbl.classList.remove('active'); const cb = lbl.querySelector('input'); if (cb) cb.checked = false; }
+            applyAll();
+        }
+        function renderVideos(videos) {
+            const info = document.getElementById('results-info');
+            const badge = document.getElementById('section-count-badge');
+            const countStr = `${videos.length} video${videos.length !== 1 ? 's' : ''}`;
+            info.innerHTML = `<strong>${videos.length}</strong> video${videos.length !== 1 ? 's' : ''} found`;
+            if (badge) badge.textContent = countStr;
+            if (!videos.length) {
+                const searchTerm = document.getElementById('search-input').value.trim();
+                const noResultsMsg = searchTerm
+                    ? `No videos match <strong>"${esc(searchTerm)}"</strong>`
+                    : 'No videos match the selected filters';
+                document.getElementById('videos-container').innerHTML = `
+                    <div class="state-box">
+                        <div class="state-icon"><i data-lucide="search-x" style="width:26px;height:26px;"></i></div>
+                        <div class="state-title">${noResultsMsg}</div>
+                        <div class="state-sub">Try broadening your search, or use Ask LibrAI for natural language queries like <em>"videos about ${esc(searchTerm || 'engineering')}"</em></div>
+                    </div>`;
+                lucide.createIcons(); return;
+            }
+            const isList = currentView === 'list';
+            document.getElementById('videos-container').innerHTML = `<div class="${isList ? 'videos-list' : 'videos-grid'}" role="list">${videos.map(v => renderCard(v, isList)).join('')}</div>`;
+            lucide.createIcons();
+        }
+        function deriveAudience(v) {
+            if (!v.ai_summary || v.ai_summary.includes('not available for analysis') || v.ai_summary.includes('Limited transcript quality')) return null;
+            const txt = (v.ai_summary + ' ' + (v.content_type || '') + ' ' + (v.key_points || []).join(' ') + ' ' + (v.themes || []).join(' ')).toLowerCase();
+            if (txt.includes('international')) return 'International Students';
+            if (txt.includes('postgraduate') || txt.includes('masters') || txt.includes('phd')) return 'Postgraduates';
+            if (txt.includes('first year') || txt.includes('undergraduate') || txt.includes('bachelor')) return 'New Undergraduates';
+            if (v.content_type === 'Campus Tour' || txt.includes('facilities') || txt.includes('accommodation') || txt.includes('tour')) return 'Campus Explorers';
+            if (txt.includes('applicant') || txt.includes('admissions')) return 'Applicants';
+            if (v.content_type === 'Course Information' || v.content_type === 'Day in the Life') return 'Prospective Students';
+            return 'General Interest';
+        }
+        function renderCard(v, isList) {
+            const tc = TYPE_CLASSES[v.content_type] || 'university';
+            const dur = fmtDur(v.duration_estimate);
+            // DELETE BUTTON
+            const deleteBtn = `
+        <button class="video-delete-btn" 
+                onclick="event.stopPropagation(); deleteVideo('${v.video_file.replace(/'/g, "\\'")}');" 
+                title="Remove from library"
+                aria-label="Delete video">
+            <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+        </button>
+    `;
+
+            // Extract YouTube ID for thumbnail
+            // Extract YouTube ID for thumbnail
+            const ytId = extractYTId(v.video_file);
+            const thumbnailUrl = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : null;
+
+            const thumbnail = `<div class="video-thumbnail" style="${thumbnailUrl ? `background-image: url('${thumbnailUrl}');` : 'background: linear-gradient(135deg, var(--brand) 0%, var(--electric) 100%);'}">
+    <div class="play-overlay">▶</div>
+</div>`;
+            const highlights = (v.key_points || []).map(p => `<div class="vc-hl-item"><span class="vc-hl-dot"></span><span>${esc(p)}</span></div>`).join('');
+            const buildings = (v.buildings || []).map(b => `<span class="vc-tag building"><i data-lucide="map-pin" style="width:10px;height:10px;"></i>${esc(b)}</span>`).join('');
+            const topics = (v.topics || []).map(t => `<span class="vc-tag topic"><i data-lucide="tag" style="width:10px;height:10px;"></i>${esc(t)}</span>`).join('');
+            const themes = (v.themes || []).map(th => `<span class="vc-tag" style="background:var(--bg);color:var(--text);border:1px solid var(--border);"><i data-lucide="heart" style="width:10px;height:10px;color:#ec4899;"></i>${esc(th)}</span>`).join('');
+            const typeRow = `<span class="vc-type ${tc}">${esc(v.content_type)}</span>${dur ? `<span class="vc-dur"><i data-lucide="clock" style="width:11px;height:11px;"></i>${dur}</span>` : ''}`;
+            const audience = deriveAudience(v);
+            const audienceBadge = audience ? `<span class="vc-audience-badge" title="Target Audience: ${esc(audience)}"><i data-lucide="users" style="width:10px;height:10px;"></i>${esc(audience)}</span>` : '';
+            const wBadge = v.transcript_length ? `<div class="vc-transcript-badge"><i data-lucide="file-text" style="width:12px;height:12px;"></i>${fmtWords(v.transcript_length)} words transcribed</div>` : '';
+
+            // Human-readable title from AI summary (first 8 words), fallback to type + date
+            const dateStr = v.video_file ? v.video_file.substring(0, 8) : '';
+            const dateLabel = dateStr.length === 8 ? `${dateStr.slice(0, 4)}/${dateStr.slice(4, 6)}` : '';
+            const isPlaceholder = !v.ai_summary || v.ai_summary.includes('not available for analysis') || v.ai_summary.includes('Limited transcript quality');
+            const words = (v.ai_summary || '').split(' ');
+            const summaryTitle = !isPlaceholder
+                ? words.slice(0, 8).join(' ') + (words.length > 8 ? '\u2026' : '')
+                : `${v.content_type || 'Video'} \u2014 ${dateLabel}`;
+            const clickHint = `<div style="font-size:.64rem;color:var(--muted);opacity:.5;display:flex;align-items:center;gap:3px;margin-top:3px;"><i data-lucide="panel-right" style="width:10px;height:10px;"></i> Click to explore</div>`;
+            const trSnippet = v.transcriptMatch ? `
+                <div class="vc-transcript-snippet">
+                    <div class="vc-snippet-header">
+                        <i data-lucide="quote" style="width:12px;height:12px;"></i>
+                        Found in Transcript
+                    </div>
+                    <div class="vc-snippet-text">${v.transcriptMatch}</div>
+                </div>
+            ` : '';
+
+            const matchIcons = { 'Title': 'type', 'Summary': 'sparkles', 'Building': 'map-pin', 'Subject': 'tag', 'Transcript': 'file-text', 'Key Points': 'list-checks' };
+            const transparency = (v.matchReasons && v.matchReasons.length > 0) ? `
+                <div class="vc-transparency" title="AI Insight: Shows where your search term matched within the video data.">
+                    <span class="vc-transparency-label">
+                        <i data-lucide="info" style="width:11px;height:11px;"></i>
+                        Matched in:
+                    </span>
+                    ${[...new Set(v.matchReasons)].map(r => `<span class="vc-match-chip" title="Match found in ${r}"><i data-lucide="${matchIcons[r] || 'bolt'}" style="width:11px;height:11px;"></i>${esc(r)}</span>`).join('')}
+                </div>
+            ` : '';
+
+            if (isList) return `<article class="video-card video-card-list" role="listitem" onclick="openDetail('${v.video_file.replace(/'/g, "\\'")}')" style="cursor:pointer" title="Click to open detail panel"><div class="vc-icon" style="width:48px;height:48px;"><i data-lucide="video" style="width:22px;height:22px;"></i></div><div class="vc-body"><div class="vc-type-row">${typeRow}${audienceBadge}</div><div class="vc-title">${esc(summaryTitle)}</div><div class="vc-summary">${esc(v.ai_summary)}</div>${trSnippet}${transparency}<div class="vc-tags">${buildings}${themes}${topics}</div></div></article>`;
+            return `<article class="video-card" role="listitem" onclick="openDetail('${v.video_file.replace(/'/g, "\\'")}')" style="cursor:pointer;position:relative;" title="Click to open detail panel">
+    ${deleteBtn}
+    ${thumbnail}
+    <div class="vc-top">
+                    <div class="vc-icon"><i data-lucide="video" style="width:19px;height:19px;"></i></div>
+                    <div class="vc-meta">
+                        <div class="vc-type-row">${typeRow}${audienceBadge}</div>
+                        <div class="vc-title">${esc(summaryTitle)}</div>
+                        ${clickHint}
+                    </div>
+                </div>
+                <div class="vc-divider"></div>
+                <div class="vc-summary">${esc(v.ai_summary)}</div>
+                ${trSnippet}
+                ${highlights ? `<div class="vc-highlights"><div class="vc-hl-title"><i data-lucide="list-checks" style="width:11px;height:11px;"></i>Key Points</div>${highlights}</div>` : ''}
+                ${wBadge}${transparency}
+                <div class="vc-tags">${buildings}${themes}${topics}</div>
+            </article>`;
+        }
+        function setView(v) { currentView = v; document.getElementById('btn-grid').classList.toggle('active', v === 'grid'); document.getElementById('btn-list').classList.toggle('active', v === 'list'); document.getElementById('btn-grid').setAttribute('aria-pressed', v === 'grid'); document.getElementById('btn-list').setAttribute('aria-pressed', v === 'list'); applyAll(); }
+
+        /* ── VOICE SEARCH ─────────────────────────────── */
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRec();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-GB';
+
+            recognition.onstart = () => {
+                document.getElementById('voice-search-btn').classList.add('listening');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById('search-input');
+                input.value = transcript;
+                applyAll();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                document.getElementById('voice-search-btn').classList.remove('listening');
+            };
+
+            recognition.onend = () => {
+                document.getElementById('voice-search-btn').classList.remove('listening');
+            };
+        }
+
+        function toggleVoiceSearch() {
+            if (!recognition) {
+                alert('Voice search is not supported in your browser. (Chrome recommended)');
+                return;
+            }
+            try {
+                recognition.start();
+            } catch (e) {
+                recognition.stop();
+            }
+        }
+
+        function openModal() {
+            document.getElementById('modal-overlay').classList.add('open');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === e.currentTarget) closeModal();
+        }
+
+        async function addVideo() {
+            const url = document.getElementById('youtube-url').value.trim();
+            const btn = document.getElementById('modal-submit-btn');
+
+            if (!url) {
+                showModalStatus('Please enter a YouTube URL.', 'error');
+                return;
+            }
+
+            // Extract YouTube ID from URL
+            const ytIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+            if (ytIdMatch) {
+                const ytId = ytIdMatch[1];
+
+                // Check if video already exists in library
+                const existingVideo = allVideos.find(v => v.video_file.includes(ytId));
+                if (existingVideo) {
+                    showModalStatus('⚠️ This video already exists in the library!', 'error');
+                    return;
+                }
+            }
+
+            btn.disabled = true;
+            document.getElementById('submit-label').textContent = 'Processing...';
+            document.getElementById('submit-icon').outerHTML = `<i id="submit-icon" data-lucide="loader" style="width:17px;height:17px;" class="spin"></i>`;
+            lucide.createIcons();
+
+            try {
+                const r = await fetch(`${API}/api/add-video`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const d = await r.json();
+
+                if (r.ok) {
+                    currentTaskId = d.task_id;
+                    showModalStatus('Video added — transcription starting...', 'info');
+                    document.getElementById('modal-progress').classList.add('active');
+                    statusInterval = setInterval(checkStatus, 2000);
+                    document.getElementById('youtube-url').value = '';
+                } else {
+                    showModalStatus(d.error || 'Failed to add video.', 'error');
+                    resetModalBtn();
+                }
+            } catch {
+                showModalStatus('Could not reach the API server.', 'error');
+                resetModalBtn();
+            }
+        }
+
+        async function deleteVideo(videoFile) {  // ← SEPARATE FUNCTION!
+            if (!confirm(`Are you sure you want to delete this video from the library?\n\n${videoFile}`)) {
+                return;
+            }
+
+            try {
+                const r = await fetch(`${API}/api/delete-video/${videoFile}`, {
+                    method: 'DELETE'
+                });
+
+                if (r.ok) {
+                    allVideos = allVideos.filter(v => v.video_file !== videoFile);
+                    updateStats();
+                    applyAll();
+                    alert(' Video deleted successfully!');
+                } else {
+                    const data = await r.json();
+                    alert(' Failed to delete video: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert(' Error deleting video: ' + e.message);
+            }
+        }
+
+
+
+
+        function exportResults() {
+            const currentResults = document.querySelectorAll('.video-card').length;
+            const csv = 'Summary,Buildings,Topics\n' + allVideos
+                .map(v => `"${(v.ai_summary || '').replace(/"/g, '""')}","${(v.buildings || []).join('; ')}","${(v.topics || []).join('; ')}"`)
+                .join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sheffield_videos_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert(`✅ Exported ${allVideos.length} videos to CSV`);
+        }
+
+        function resetModalBtn() {
+            const btn = document.getElementById('modal-submit-btn');
+            btn.disabled = false;
+            document.getElementById('submit-label').textContent = 'Add & Process Video';
+            document.getElementById('submit-icon').outerHTML = `<i id="submit-icon" data-lucide="upload-cloud" style="width:17px;height:17px;"></i>`;
+            lucide.createIcons();
+        }
+        async function checkStatus() {
+            if (!currentTaskId) return;
+            try {
+                const r = await fetch(`${API}/api/status/${currentTaskId}`); const s = await r.json();
+                document.getElementById('modal-progress-fill').style.width = s.progress + '%';
+                const type = s.status === 'error' ? 'error' : s.status === 'complete' ? 'success' : 'info';
+                showModalStatus(s.message, type);
+                if (s.status === 'complete') { clearInterval(statusInterval); resetModalBtn(); setTimeout(() => { loadVideos(); document.getElementById('modal-progress').classList.remove('active'); }, 2000); }
+                else if (s.status === 'error') { clearInterval(statusInterval); resetModalBtn(); document.getElementById('modal-progress').classList.remove('active'); }
+            } catch (e) { console.error(e); }
+        }
+        function showModalStatus(msg, type) {
+            const el = document.getElementById('modal-status');
+            const icons = { info: 'info', success: 'check-circle', error: 'alert-triangle' };
+            el.innerHTML = `<i data-lucide="${icons[type]}" style="width:15px;height:15px;flex-shrink:0;"></i><span>${esc(msg)}</span>`;
+            el.className = 'modal-status ' + type; lucide.createIcons();
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDetail();
+            }
+            if (e.key === 'Enter' && e.target === document.getElementById('search-input')) applyAll();
+            if (e.key === 'Enter' && e.target === document.getElementById('youtube-url')) addVideo();
+        });
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); loadVideos(); });
+    </script>
+</body>
+
+</html>

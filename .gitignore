@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vscode/
+.DS_Store
+ffmpeg.exe
+ffprobe.exe
+*.exe
+videos/
+output/
+*.mp4
+*.mov
+*.mkv
+.env
