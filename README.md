@@ -1,35 +1,35 @@
-# 🎓 LibrAI — University of Sheffield Video Intelligence Platform
+# LibrAI — University of Sheffield Video Intelligence Platform
 
 **Empowering students and researchers with AI-driven video content extraction, accessibility, and discovery.**
 
 ---
 
-## 🎯 The Vision
+## The Vision
 Modern education happens on video, but video content is traditionally "dark data"—unsearchable, inaccessible, and hard to navigate. **LibrAI** transforms the University of Sheffield's video library into a rich, searchable intelligence asset.
 
 ---
 
-## 🚀 Core Features
+## Core Features
 
 ### 📡 Intelligent Ingestion
 - **URL Upload Support**: Directly paste YouTube URLs to ingest them into the library.
 - **Automated Download**: Uses `yt-dlp` to fetch high-quality media for processing.
 - **Native Caption Proxy**: Automatically fetches professional YouTube captions if available, falling back to AI transcription only when necessary.
 
-### 🧠 Advanced AI Pipeline
+### Advanced AI Pipeline
 - **OpenAI Whisper Transcription**: 95%+ accurate English transcription for even the noisest lecture halls.
 - **Smart Summarization**: Generates real human-readable summaries (not just extracted sentences) tailored to the Sheffield academic context.
 - **Entity Extraction**: Automatically detects campus buildings (The Diamond, Arts Tower, Information Commons, etc.) and academic subjects.
 - **Topic & Theme Classification**: Categorizes videos into "Day in the Life," "Research Showcase," "Course Information," and more.
 
-### 🔍 Discovery & Accessibility
+### Discovery & Accessibility
 - **High-Fidelity Search**: Fuzzy search through full transcripts and metadata.
 - **Detail Panel**: Interactive side-panel featuring synced subtitles, AI summaries, and key metadata chips.
 - **SRT Generation**: Automatically generates `.srt` subtitle files for every processed video to improve accessibility.
 
 ---
 
-## 🛠️ Technical Stack
+## Technical Stack
 - **Backend**: Python 3.14+ / Flask
 - **Processing**: OpenAI Whisper, FFmpeg, yt-dlp
 - **Frontend**: Vanilla HTML5, CSS3 (Modern UI/UX), JavaScript (ES6+)
@@ -37,7 +37,7 @@ Modern education happens on video, but video content is traditionally "dark data
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 | File | Purpose |
 |------|---------|
